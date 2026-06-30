@@ -41,6 +41,23 @@ def save_yaml(data, path):
         print(f"Błąd zapisu do pliku YAML: {e}")
         sys.exit(1)
 
+def xml_to_dict(element):
+    subdict = {}
+    for child in element:
+        if len(child) > 0:
+            subdict[child.tag] = xml_to_dict(child)
+        else:
+            subdict[child.tag] = child.text
+    return subdict if subdict else element.text
+
+def load_xml(path):
+    try:
+        tree = ET.parse(path)
+        root = tree.getroot()
+        return {root.tag: xml_to_dict(root)}
+    except ET.ParseError as e:
+        print(f"Błąd składni XML w pliku {path}: {e}")
+        sys.exit(1)
 
 def main():
     if len(sys.argv) != 3:
