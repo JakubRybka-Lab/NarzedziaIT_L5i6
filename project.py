@@ -38,7 +38,7 @@ def save_yaml(data, path):
         with open(path, 'w', encoding='utf-8') as f:
             yaml.safe_dump(data, f, allow_unicode=True, default_flow_style=False)
     except Exception as e:
-        print(f"Błąd zapisu do pliku YAML: {e}")
+    print(f"Błąd zapisu do pliku YAML: {e}")
         sys.exit(1)
 
 def xml_to_dict(element):
@@ -153,11 +153,9 @@ def run_conversion(self):
             QMessageBox.warning(self, "Błąd", "Wybierz oba pliki!")
             return
 
-        # Blokujemy przycisk na czas konwersji, żeby użytkownik nie kliknął dwa razy
         self.btn_run.setEnabled(False)
         self.btn_run.setText("Konwertowanie...")
 
-        # Inicjalizacja i uruchomienie wątku asynchronicznego (Task 9)
         self.worker = ConversionWorker(self.input_file, self.output_file)
         self.worker.finished.connect(self.on_success)
         self.worker.error.connect(self.on_error)
