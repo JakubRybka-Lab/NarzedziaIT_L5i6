@@ -22,6 +22,17 @@ def save_json(data, path):
         print(f"Błąd zapisu do pliku JSON: {e}")
         sys.exit(1)
 
+def load_yaml(path):
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+            if data is None:
+                raise ValueError("Plik YAML jest pusty.")
+            return data
+    except yaml.YAMLError as e:
+        print(f"Błąd składni YAML w pliku {path}: {e}")
+        sys.exit(1)
+
 def main():
     if len(sys.argv) != 3:
         print("Błąd: Niepoprawna liczba argumentów!")
