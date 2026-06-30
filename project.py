@@ -59,6 +59,39 @@ def load_xml(path):
         print(f"Błąd składni XML w pliku {path}: {e}")
         sys.exit(1)
 
+def dict_to_xml(tag, d):
+    elem = ET.Element(tag)
+    if isinstance(d, dict):
+        for key, val in d.items():
+            child = dict_to_xml(key, val)
+            elem.append(child)
+    else:
+        elem.text = str(d)
+    return elem
+
+def save_xml(data, path):
+    try:
+        root_tag = list(data.keys())[0]
+        root_element = dict_to_xml(root_tag, data[root_tag])
+        tree = ET.ElementTree(root_element)
+        ET.indent(tree, space="    ", level=0)
+        tree.write(path, encoding='utf-8', xml_declaration=True)
+    except Exception as e:S
+        print(f"Błąd zapisu do pliku XML: {e}")
+        sys.exit(1)
+
+def convert_data(input_path, output_path):
+    ext_in = os.path.splitext(input_path)[1].lower()
+    ext_out = os.path.splitext(output_path)[1].lower()
+
+    if ext_in == '.json': data = load_json(input_path)
+    elif ext_in in ['.yml', '.yaml']: data = load_yaml(input_path)
+    elif ext_in == '.xml': data = load_xml(input_path)
+
+    if ext_out == '.json': save_json(data, output_path)
+    elif ext_out in ['.yml', '.yaml']: save_yaml(data, output_path)
+    elif ext_out == '.xml': save_xml(data, output_path)
+
 def main():
     if len(sys.argv) != 3:
         print("Błąd: Niepoprawna liczba argumentów!")
@@ -81,6 +114,8 @@ def main():
         sys.exit(1)
 
     print(f"Konwersja z {ext_in} do {ext_out}...")
+convert_data(input_path, output_path)
+ print("Sukces! Konwersja zakończona powodzeniem.")
 
 if __name__ == "__main__":
     main()
