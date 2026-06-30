@@ -33,6 +33,15 @@ def load_yaml(path):
         print(f"Błąd składni YAML w pliku {path}: {e}")
         sys.exit(1)
 
+def save_yaml(data, path):
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            yaml.safe_dump(data, f, allow_unicode=True, default_flow_style=False)
+    except Exception as e:
+        print(f"Błąd zapisu do pliku YAML: {e}")
+        sys.exit(1)
+
+
 def main():
     if len(sys.argv) != 3:
         print("Błąd: Niepoprawna liczba argumentów!")
