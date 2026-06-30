@@ -6,6 +6,14 @@ import xml.etree.ElementTree as ET
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QMessageBox
 from PyQt6.QtCore import QThread, pyqtSignal
 
+def load_json(path):
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Błąd składni JSON w pliku {path}: {e}")
+        sys.exit(1)
+
 def main():
     if len(sys.argv) != 3:
         print("Błąd: Niepoprawna liczba argumentów!")
