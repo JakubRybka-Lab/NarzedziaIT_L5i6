@@ -92,30 +92,76 @@ def convert_data(input_path, output_path):
     elif ext_out in ['.yml', '.yaml']: save_yaml(data, output_path)
     elif ext_out == '.xml': save_xml(data, output_path)
 
+class ConverterApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Konwerter plików - Task 8")
+        self.setGeometry(100, 100, 400, 200)
+        self.input_file = ""
+        self.output_file = ""
+
+        self.label_in = QLabel("Nie wybrano pliku wejściowego", self)
+        self.btn_in = QPushButton("Wybierz plik wejściowy", self)
+        self.btn_in.clicked.connect(self.select_in)
+
+        self.label_out = QLabel("Nie wybrano pliku wyjściowego", self)
+        self.btn_out = QPushButton("Wybierz plik docelowy", self)
+        self.btn_out.clicked.connect(self.select_out)
+
+        self.btn_run = QPushButton("Konwertuj", self)
+        self.btn_run.clicked.connect(self.run_conversion)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.btn_in)
+        layout.addWidget(self.label_in)
+        layout.addWidget(self.btn_out)
+        layout.addWidget(self.label_out)
+        layout.addWidget(self.btn_run)
+
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
+
+    def select_in(self):
+        file, _ = QFileDialog.getOpenFileName(self, "Wybierz plik", "", "Formaty (*.json *.yml *.yaml *.xml)")
+        if file:
+            self.input_file = file
+            self.label_in.setText(os.path.basename(file))
+
+    def select_out(self):
+        file, _ = QFileDialog.getSaveFileName(self, "Zapisz jako", "", "JSON (*.json);;YAML (*.yml);;XML (*.xml)")
+        if file:
+            self.output_file = file
+            self.label_out.setText(os.path.basename(file))
+
+    def run_conversion(self):
+        if not self.input_file or not self.output_file:
+            QMessageBox.warning(self, "Błąd", "Wybierz oba pliki!")
+            return
+        try:
+            convert_data(self.input_file, self.output_file)
+            QMessageBox.information(self, "Sukces", "Konwersja udana!")
+        except Exception as e:
+            QMessageBox.critical(self, "Błąd", str(e))
+
 def main():
-    if len(sys.argv) != 3:
+    if len(sys.argv) == 3:
+        input_path = sys.argv[1]
+        output_path = sys.argv[2]
+        if not os.path.exists(input_path):
+            print("Błąd: Plik wejściowy nie istnieje.")
+            sys.exit(1)
+        convert_data(input_path, output_path)
+        print("Sukces! Konwersja zakończona powodzeniem.")
+    elif len(sys.argv) == 1:
+        app = QApplication(sys.argv)
+        window = ConverterApp()
+        window.show()
+        sys.exit(app.exec())
+    else:
         print("Błąd: Niepoprawna liczba argumentów!")
         print("Użycie: program.exe pathFile1.x pathFile2.y")
         sys.exit(1)
-
-    input_path = sys.argv[1]
-    output_path = sys.argv[2]
-
-    if not os.path.exists(input_path):
-        print(f"Błąd: Plik '{input_path}' nie istnieje.")
-        sys.exit(1)
-
-    allowed = ['.json', '.yml', '.yaml', '.xml']
-    ext_in = os.path.splitext(input_path)[1].lower()
-    ext_out = os.path.splitext(output_path)[1].lower()
-
-    if ext_in not in allowed or ext_out not in allowed:
-        print(f"Błąd: Niedozwolony format pliku. Obsługiwane: {allowed}")
-        sys.exit(1)
-
-    print(f"Konwersja z {ext_in} do {ext_out}...")
-convert_data(input_path, output_path)
- print("Sukces! Konwersja zakończona powodzeniem.")
 
 if __name__ == "__main__":
     main()
