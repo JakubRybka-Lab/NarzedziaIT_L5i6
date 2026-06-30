@@ -14,6 +14,14 @@ def load_json(path):
         print(f"Błąd składni JSON w pliku {path}: {e}")
         sys.exit(1)
 
+def save_json(data, path):
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"Błąd zapisu do pliku JSON: {e}")
+        sys.exit(1)
+
 def main():
     if len(sys.argv) != 3:
         print("Błąd: Niepoprawna liczba argumentów!")
