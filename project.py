@@ -11,7 +11,7 @@ def load_json(path):
         with open(path, 'r', encoding='utf-8') as f:
             return json.load(f)
     except json.JSONDecodeError as e:
-        print(f"Błąd składni JSON w pliku {path}: {e}")
+    print(f"Błąd składni JSON w pliku {path}: {e}")
         sys.exit(1)
 
 def save_json(data, path):
@@ -19,7 +19,7 @@ def save_json(data, path):
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
     except Exception as e:
-        print(f"Błąd zapisu do pliku JSON: {e}")
+    print(f"Błąd zapisu do pliku JSON: {e}")
         sys.exit(1)
 
 def load_yaml(path):
@@ -30,7 +30,7 @@ def load_yaml(path):
                 raise ValueError("Plik YAML jest pusty.")
             return data
     except yaml.YAMLError as e:
-        print(f"Błąd składni YAML w pliku {path}: {e}")
+    print(f"Błąd składni YAML w pliku {path}: {e}")
         sys.exit(1)
 
 def save_yaml(data, path):
@@ -56,7 +56,7 @@ def load_xml(path):
         root = tree.getroot()
         return {root.tag: xml_to_dict(root)}
     except ET.ParseError as e:
-        print(f"Błąd składni XML w pliku {path}: {e}")
+    print(f"Błąd składni XML w pliku {path}: {e}")
         sys.exit(1)
 
 def dict_to_xml(tag, d):
@@ -77,7 +77,7 @@ def save_xml(data, path):
         ET.indent(tree, space="    ", level=0)
         tree.write(path, encoding='utf-8', xml_declaration=True)
     except Exception as e:S
-        print(f"Błąd zapisu do pliku XML: {e}")
+    print(f"Błąd zapisu do pliku XML: {e}")
         sys.exit(1)
 
 def convert_data(input_path, output_path):
