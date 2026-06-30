@@ -91,6 +91,21 @@ def convert_data(input_path, output_path):
     if ext_out == '.json': save_json(data, output_path)
     elif ext_out in ['.yml', '.yaml']: save_yaml(data, output_path)
     elif ext_out == '.xml': save_xml(data, output_path)
+class ConversionWorker(QThread):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+
+    def __init__(self, in_p, out_p):
+        super().__init__()
+        self.in_p = in_p
+        self.out_p = out_p
+
+    def run(self):
+        try:
+            convert_data(self.in_p, self.out_p)
+            self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))
 
 class ConverterApp(QMainWindow):
     def __init__(self):
@@ -133,16 +148,30 @@ class ConverterApp(QMainWindow):
         if file:
             self.output_file = file
             self.label_out.setText(os.path.basename(file))
-
-    def run_conversion(self):
+def run_conversion(self):
         if not self.input_file or not self.output_file:
             QMessageBox.warning(self, "Błąd", "Wybierz oba pliki!")
             return
-        try:
-            convert_data(self.input_file, self.output_file)
-            QMessageBox.information(self, "Sukces", "Konwersja udana!")
-        except Exception as e:
-            QMessageBox.critical(self, "Błąd", str(e))
+
+        # Blokujemy przycisk na czas konwersji, żeby użytkownik nie kliknął dwa razy
+        self.btn_run.setEnabled(False)
+        self.btn_run.setText("Konwertowanie...")
+
+        # Inicjalizacja i uruchomienie wątku asynchronicznego (Task 9)
+        self.worker = ConversionWorker(self.input_file, self.output_file)
+        self.worker.finished.connect(self.on_success)
+        self.worker.error.connect(self.on_error)
+        self.worker.start()
+
+    def on_success(self):
+        self.btn_run.setEnabled(True)
+        self.btn_run.setText("Konwertuj")
+        QMessageBox.information(self, "Sukces", "Konwersja asynchroniczna zakończona sukcesem!")
+
+    def on_error(self, err):
+        self.btn_run.setEnabled(True)
+        self.btn_run.setText("Konwertuj")
+        QMessageBox.critical(self, "Błąd", f"Błąd w tle: {err}")
 
 def main():
     if len(sys.argv) == 3:
